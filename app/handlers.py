@@ -76,18 +76,18 @@ async def reg_quantity(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(Reg.zones, F.data)
 async def reg_zones(callback: CallbackQuery, state: FSMContext):
     await state.update_data(zones=callback.data)
-    #data = await state.get_data()
-    # await callback.message.answer('Секунду, программа тренировок составляется по заданным параметрам...')
-    # ans = await generate(
-    #     age=data["age"],
-    #     experience=data["experience"],
-    #     level=data["level"],
-    #     goal=data["goal"],
-    #     type_tr=data["type_tr"],
-    #     quantity=data["quantity"],
-    #     zones=data["zones"]
-    # )
-    # await callback.message.answer(ans)
+    data = await state.get_data()
+    await callback.message.answer('Секунду, программа тренировок составляется по заданным параметрам...')
+    ans = await generate(
+        age=data["age"],
+        experience=data["experience"],
+        level=data["level"],
+        goal=data["goal"],
+        type_tr=data["type_tr"],
+        quantity=data["quantity"],
+        zones=data["zones"]
+    )
+    await callback.message.answer(ans)
     await state.set_state(Reg.abonement)
     await callback.message.answer('Желаете ли записаться в зал?', reply_markup=kb.abonement_keyboard)
 

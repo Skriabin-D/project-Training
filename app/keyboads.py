@@ -3,7 +3,9 @@ from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeybo
 check_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='/create')],
     [KeyboardButton(text='Проверить, сколько времени осталось от абонемента')]
-])
+    ],
+    resize_keyboard=True
+)
 
 age_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text='до 30 лет', callback_data='less than 30 years'), InlineKeyboardButton(text='30-40 лет', callback_data='30-40 years')],
