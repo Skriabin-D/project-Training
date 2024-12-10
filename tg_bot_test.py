@@ -14,24 +14,26 @@ from app.handlers import reg_zones  # Импортируем функцию, к�
 from app.keyboads import abonement_keyboard  # Импортируем клавиатуру для проверки
 from aiogram.fsm.context import FSMContext
 from app.handlers import time  # Импортируем функцию, которую тестируем
-
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import AsyncMock
 from aiogram.types import Message
 import app.database.requests as rq  # Импортируем внешнюю зависимость
 from app.handlers import check  # Импортируем тестируемую функцию
+from datetime import datetime, timedelta
+from app.database.requests import set_user  # Замените на реальные пути
+from app.database.models import User
+
 
 @pytest.mark.asyncio
 async def test_start():
     # Мокаем message и state
-    message = MagicMock(Message)
-    state = MagicMock(FSMContext)
+    message = AsyncMock(Message)
 
     # Положительный тест:
     # Мокаем успешный ответ от метода answer, используя AsyncMock
     message.answer = AsyncMock()
 
     # Выполняем вызов тестируемой функции
-    await start(message, state)
+    await start(message)
 
     # Проверяем, что был вызван метод answer с нужными параметрами
     message.answer.assert_called_once_with(
@@ -45,7 +47,7 @@ async def test_start():
 
     # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
     with pytest.raises(Exception, match="Failed to send message"):
-        await start(message, state)
+        await start(message)
 
     # Проверяем, что метод answer был вызван хотя бы один раз
     message.answer.assert_called_once()
@@ -53,11 +55,11 @@ async def test_start():
 @pytest.mark.asyncio
 async def test_register():
     # Мокаем объекты message и state
-    message = MagicMock(Message)
-    state = MagicMock(FSMContext)
+    message = AsyncMock(Message)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибут from_user в message
-    message.from_user = MagicMock(User)
+    message.from_user = AsyncMock(User)
     message.from_user.id = 12345  # Устанавливаем ID пользователя
 
     # Мокаем методы, которые должны быть асинхронными
@@ -105,15 +107,15 @@ async def test_register():
 @pytest.mark.asyncio
 async def test_reg_age():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = '25'  # Пример значения для возраста
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
+    callback.message.edit_text = AsyncMock()
     state.set_state = AsyncMock()
     state.update_data = AsyncMock()
 
@@ -124,13 +126,13 @@ async def test_reg_age():
     # Проверяем, что методы были вызваны с правильными параметрами
     state.update_data.assert_called_once_with(age=callback.data)
     state.set_state.assert_called_once_with(Reg.experience)
-    callback.message.answer.assert_called_once_with(
+    callback.message.edit_text.assert_called_once_with(
         'Укажи свой опыт тренировок', reply_markup=kb.experience_keyboard
     )
 
     # Отрицательный тест:
     # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    callback.message.edit_text = AsyncMock(side_effect=Exception("Failed to send message"))
 
     # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
     with pytest.raises(Exception, match="Failed to send message"):
@@ -152,12 +154,12 @@ async def test_reg_age():
 @pytest.mark.asyncio
 async def test_reg_exp():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'Beginner'  # Пример значения для опыта
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -200,12 +202,12 @@ async def test_reg_exp():
 @pytest.mark.asyncio
 async def test_reg_level():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'Intermediate'  # Пример значения для уровня
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -247,12 +249,12 @@ async def test_reg_level():
 @pytest.mark.asyncio
 async def test_reg_goal():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'weight_loss'  # Пример значения для цели
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -294,12 +296,12 @@ async def test_reg_goal():
 @pytest.mark.asyncio
 async def test_reg_type():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'strength'  # Пример значения для типа тренировок
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -342,12 +344,12 @@ async def test_reg_type():
 @pytest.mark.asyncio
 async def test_reg_quantity():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = '3'  # Пример значения для количества тренировок в неделю
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -391,12 +393,12 @@ async def test_reg_quantity():
 @pytest.mark.asyncio
 async def test_reg_zones():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'chest'  # Пример данных (зона)
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -431,12 +433,12 @@ async def test_reg_zones():
 @pytest.mark.asyncio
 async def test_abonement():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = 'disagree'  # Сценарий, когда пользователь не согласен с абонементом
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -480,12 +482,12 @@ async def test_abonement():
 @pytest.mark.asyncio
 async def test_time():
     # Мокаем объекты callback и state
-    callback = MagicMock(CallbackQuery)
-    state = MagicMock(FSMContext)
+    callback = AsyncMock(CallbackQuery)
+    state = AsyncMock(FSMContext)
 
     # Мокаем атрибуты в callback
     callback.data = '12:00'  # Пример данных (время)
-    callback.message = MagicMock(Message)
+    callback.message = AsyncMock(Message)
 
     # Мокаем асинхронные методы
     callback.message.answer = AsyncMock()
@@ -533,8 +535,8 @@ async def test_time():
 @pytest.mark.asyncio
 async def test_check():
     # Мокаем объекты
-    message = MagicMock(Message)
-    message.from_user = MagicMock(id=123456789)  # Добавляем атрибут from_user с id
+    message = AsyncMock(Message)
+    message.from_user = AsyncMock(id=123456789)  # Добавляем атрибут from_user с id
     message.answer = AsyncMock()  # Мокаем метод для отправки сообщений
 
     # Положительный тест: абонемент действителен, например, 30 дней
@@ -577,3 +579,52 @@ async def test_check():
 
     # Подсчитываем количество вызовов метода answer
     assert message.answer.call_count == 3  # Должен быть вызван ровно 3 раза
+
+
+
+@pytest.mark.asyncio
+async def test_set_user_adds_user_when_not_exist():
+    # Настроим фикстуру для асинхронной сессии
+    async_session = AsyncMock()
+
+    # Имитация того, что пользователя нет в базе данных
+    async_session.scalar.return_value = None
+
+    tg_id = '12345'
+    time = '5'
+
+    # Вызов функции
+    await set_user(tg_id, time, async_session)
+
+    # Проверка, что метод добавления пользователя был вызван
+    async_session.add.assert_called_once()
+
+    # Проверка правильности параметров добавляемого пользователя
+    added_user = async_session.add.call_args[0][0]
+    assert added_user.tg_id == tg_id
+    assert added_user.time > datetime.utcnow()  # Проверка, что время в будущем
+
+    # Проверка, что commit был вызван
+    async_session.commit.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_set_user_does_not_add_user_when_exists():
+    # Настроим фикстуру для асинхронной сессии
+    async_session = AsyncMock()
+
+    # Имитация того, что пользователь уже существует
+    existing_user = User(tg_id='12345', time=datetime.utcnow())
+    async_session.scalar.return_value = existing_user
+
+    tg_id = '12345'
+    time = '5'
+
+    # Вызов функции
+    await set_user(tg_id, time, async_session)
+
+    # Проверка, что метод добавления пользователя не был вызван
+    async_session.add.assert_not_called()
+
+    # Проверка, что commit не был вызван
+    async_session.commit.assert_not_called()

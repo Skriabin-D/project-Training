@@ -22,5 +22,6 @@ async def get_info(tg_id):
 async def del_user(tg_id):
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
-        session.delete(user)
+        await session.delete(user)
         await session.commit()
+    print(f'Пользователь {tg_id} удален')
