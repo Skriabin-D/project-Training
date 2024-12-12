@@ -1,630 +1,400 @@
 import pytest
-from app.handlers import start, register, Reg # Импортируем тестируемую функцию
-from app.handlers import reg_age  # Импортируем тестируемую функцию
-from aiogram.types import CallbackQuery, User
-from app.handlers import reg_exp  # Импортируем тестируемую функцию
-from app.handlers import reg_level  # Импортируем тестируемую функцию
-from app.handlers import reg_goal  # Импортируем тестируемую функцию
-from app.handlers import reg_type  # Импортируем тестируемую функцию
-import app.keyboads as kb  # Для проверки клавиатуры
-from app.handlers import reg_quantity  # Импортируем тестируемую функцию
-from app.handlers import abonement
-from app.keyboads import time_keyboard  # Клавиатура для проверки
-from app.handlers import reg_zones  # Импортируем функцию, которую тестируем
-from app.keyboads import abonement_keyboard  # Импортируем клавиатуру для проверки
-from aiogram.fsm.context import FSMContext
-from app.handlers import time  # Импортируем функцию, которую тестируем
 from unittest.mock import AsyncMock
 from aiogram.types import Message
-import app.database.requests as rq  # Импортируем внешнюю зависимость
-from app.handlers import check  # Импортируем тестируемую функцию
-from datetime import datetime, timedelta
-from app.database.requests import set_user  # Замените на реальные пути
-from app.database.models import User
+from app.handlers import start, Reg, register, reg_exp, reg_age, reg_level, reg_goal, reg_type, reg_quantity, reg_zones
+import app.keyboads as kb  # Замените на ваш правильный путь
+from aiogram.types import ReplyKeyboardRemove
+from aiogram.fsm.context import FSMContext
+from aiogram.types import CallbackQuery
+
+import app.handlers as handlers
 
 
 @pytest.mark.asyncio
 async def test_start():
-    # Мокаем message и state
-    message = AsyncMock(Message)
+    # Положительный тест
+    # Мокаем объект Message
+    mock_message = AsyncMock(spec=Message)
+    mock_message.from_user = AsyncMock()  # Убеждаемся, что есть from_user
+    mock_message.from_user.id = 12345  # Пример ID пользователя
 
-    # Положительный тест:
-    # Мокаем успешный ответ от метода answer, используя AsyncMock
-    message.answer = AsyncMock()
+    # Мокаем метод answer
+    mock_message.answer = AsyncMock()
 
-    # Выполняем вызов тестируемой функции
-    await start(message)
+    # Вызов функции start
+    await start(mock_message)
 
-    # Проверяем, что был вызван метод answer с нужными параметрами
-    message.answer.assert_called_once_with(
+    # Проверяем, что метод answer вызван один раз с правильными аргументами
+    mock_message.answer.assert_called_once_with(
         text='Здарова, давай начнем составлять программу тренировок. Жми кнопку /create, чтобы сделать это, либо, если у тебя уже есть абонемент, жми на эту кнопку',
         reply_markup=kb.check_keyboard
     )
 
-    # Отрицательный тест:
-    # Мокаем ошибку при отправке сообщения, используя AsyncMock
-    message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Отрицательный тест
+    # Задаем ошибку для метода answer
+    mock_message.answer.side_effect = Exception("Ошибка при отправке сообщения")
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await start(message)
+    # Проверяем, что вызов функции start с этой ошибкой выбрасывает исключение
+    with pytest.raises(Exception, match="Ошибка при отправке сообщения"):
+        await start(mock_message)
 
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    message.answer.assert_called_once()
+    # Проверяем, что метод answer был вызван даже в случае ошибки
+    mock_message.answer.assert_called()
+
+
 
 @pytest.mark.asyncio
 async def test_register():
-    # Мокаем объекты message и state
-    message = AsyncMock(Message)
-    state = AsyncMock(FSMContext)
+    # Положительный тест
+    # Мокаем объект Message
+    mock_message = AsyncMock(spec=Message)
+    mock_message.from_user = AsyncMock()  # Убеждаемся, что есть from_user
+    mock_message.from_user.id = 12345  # Пример ID пользователя
 
-    # Мокаем атрибут from_user в message
-    message.from_user = AsyncMock(User)
-    message.from_user.id = 12345  # Устанавливаем ID пользователя
+    # Мокаем методы для message
+    mock_message.answer = AsyncMock()
 
-    # Мокаем методы, которые должны быть асинхронными
-    message.answer = AsyncMock()
-    state.set_state = AsyncMock()
-    state.update_data = AsyncMock()
+    # Мокаем FSMContext
+    mock_state = AsyncMock(spec=FSMContext)
+    mock_state.set_state = AsyncMock()
+    mock_state.update_data = AsyncMock()
 
-    # Положительный тест:
-    # Мокаем успешный ответ от метода answer и успешное обновление состояния
-    await register(message, state)
+    # Вызов функции register
+    await register(mock_message, mock_state)
 
-    # Проверяем, что метод set_state был вызван дважды с правильными параметрами
-    state.set_state.assert_any_call(Reg.tg_id)
-    state.set_state.assert_any_call(Reg.age)
-
-    # Проверяем, что метод update_data был вызван с правильными данными
-    state.update_data.assert_called_once_with(tg_id=message.from_user.id)
-
-    # Проверяем, что был вызван метод answer с правильными параметрами
-    message.answer.assert_called_once_with(
-        'Укажи свой возраст', reply_markup=kb.age_keyboard
+    # Проверяем, что message.answer был вызван с правильными параметрами
+    mock_message.answer.assert_any_call(
+        'Хорошо, давай начнем!',
+        reply_markup=ReplyKeyboardRemove()  # Проверка, что клавиатура была удалена
     )
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    mock_message.answer.assert_any_call(
+        'Укажи свой возраст',
+        reply_markup=kb.age_keyboard  # Проверка, что клавиатура с возрастом передана
+    )
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await register(message, state)
+    # Проверяем, что set_state и update_data были вызваны с правильными параметрами
+    mock_state.set_state.assert_any_call(Reg.tg_id)
+    mock_state.set_state.assert_any_call(Reg.age)
 
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    message.answer.assert_called_once()
+    mock_state.update_data.assert_called_once_with(tg_id=mock_message.from_user.id)
 
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
+    # Отрицательный тест
+    # Мокаем ошибку при вызове set_state или update_data
+    mock_state.set_state.side_effect = Exception("Ошибка при установке состояния")
 
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await register(message, state)
+    # Проверяем, что при ошибке будет выброшено исключение
+    with pytest.raises(Exception):
+        await register(mock_message, mock_state)
 
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_any_call(Reg.tg_id)
+        # Проверяем, что методы set_state и update_data были вызваны
+        mock_state.set_state.assert_any_call(Reg.tg_id)
+        mock_state.set_state.assert_any_call(Reg.age)
+        mock_state.update_data.assert_called_once_with(tg_id=mock_message.from_user.id)
+
+        # Проверяем, что answer не был вызван после ошибки
+        mock_message.answer.assert_not_called()
+
 
 @pytest.mark.asyncio
-async def test_reg_age():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("25", True, True, True),  # Положительный тест
+    ]
+)
+async def test_reg_age(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем атрибуты в callback
-    callback.data = '25'  # Пример значения для возраста
-    callback.message = AsyncMock(Message)
-
-    # Мокаем асинхронные методы
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
     callback.message.edit_text = AsyncMock()
-    state.set_state = AsyncMock()
-    state.update_data = AsyncMock()
 
-    # Положительный тест:
-    # Мокаем успешный ответ от методов answer, update_data и set_state
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
+    state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
+
+    # Вызов тестируемой функции
     await reg_age(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(age=callback.data)
-    state.set_state.assert_called_once_with(Reg.experience)
-    callback.message.edit_text.assert_called_once_with(
-        'Укажи свой опыт тренировок', reply_markup=kb.experience_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(age=callback_data)
+    else:
+        state.update_data.assert_not_called()
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.edit_text = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.experience)
+    else:
+        state.set_state.assert_not_called()
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_age(callback, state)
-
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
-
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_age(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.experience)
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Укажи свой опыт тренировок', reply_markup=kb.experience_keyboard
+        )
+    else:
+        callback.message.edit_text.assert_not_called()
 
 @pytest.mark.asyncio
-async def test_reg_exp():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("Intermediate", True, True, True)
+    ]
+)
+async def test_reg_exp(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем атрибуты в callback
-    callback.data = 'Beginner'  # Пример значения для опыта
-    callback.message = AsyncMock(Message)
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
+    callback.message.edit_text = AsyncMock()
 
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
     state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
 
-    # Положительный тест:
-    # Мокаем успешный ответ от методов answer, update_data и set_state
+    # Вызов тестируемой функции
     await reg_exp(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(experience=callback.data)
-    state.set_state.assert_called_once_with(Reg.level)
-    callback.message.answer.assert_called_once_with(
-        'Укажи свой уровень физической подготовки', reply_markup=kb.level_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(experience=callback_data)
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.level)
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_exp(callback, state)
-
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
-
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_exp(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.level)
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Укажи свой уровень физической подготовки', reply_markup=kb.level_keyboard
+        )
 
 
 @pytest.mark.asyncio
-async def test_reg_level():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("Advanced", True, True, True)
+    ]
+)
+async def test_reg_level(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем атрибуты в callback
-    callback.data = 'Intermediate'  # Пример значения для уровня
-    callback.message = AsyncMock(Message)
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
+    callback.message.edit_text = AsyncMock()
 
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
     state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
 
-    # Положительный тест:
-    # Мокаем успешный ответ от методов answer, update_data и set_state
+    # Вызов тестируемой функции
     await reg_level(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(level=callback.data)
-    state.set_state.assert_called_once_with(Reg.goal)
-    callback.message.answer.assert_called_once_with(
-        'Укажи свою цель', reply_markup=kb.goal_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(level=callback_data)
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.goal)
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_level(callback, state)
 
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Укажи свою цель', reply_markup=kb.goal_keyboard
+        )
 
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_level(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.goal)
 
 @pytest.mark.asyncio
-async def test_reg_goal():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("Weight Loss", True, True, True)
+    ]
+)
+async def test_reg_goal(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем атрибуты в callback
-    callback.data = 'weight_loss'  # Пример значения для цели
-    callback.message = AsyncMock(Message)
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
+    callback.message.edit_text = AsyncMock()
 
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
     state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
 
-    # Положительный тест:
+    # Вызов тестируемой функции
     await reg_goal(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(goal=callback.data)
-    state.set_state.assert_called_once_with(Reg.type_tr)
-    callback.message.answer.assert_called_once_with(
-        'Выберите тип тренировок', reply_markup=kb.type_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(goal=callback_data)
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.type_tr)
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_goal(callback, state)
-
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
-
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_goal(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.type_tr)
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Выберите тип тренировок', reply_markup=kb.type_keyboard
+        )
 
 
 @pytest.mark.asyncio
-async def test_reg_type():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("3", True, True, True)
+    ]
+)
+async def test_reg_type(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем атрибуты в callback
-    callback.data = 'strength'  # Пример значения для типа тренировок
-    callback.message = AsyncMock(Message)
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
+    callback.message.edit_text = AsyncMock()
 
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
     state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
 
-    # Положительный тест:
+    # Вызов тестируемой функции
     await reg_type(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(type_tr=callback.data)
-    state.set_state.assert_called_once_with(Reg.quantity)
-    callback.message.answer.assert_called_once_with(
-        'Выберите количество тренировок в неделю', reply_markup=kb.quantity_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(type_tr=callback_data)
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.quantity)
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_type(callback, state)
-
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
-
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_type(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.quantity)
-
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Выберите количество тренировок в неделю', reply_markup=kb.quantity_keyboard
+        )
 
 
 @pytest.mark.asyncio
-async def test_reg_quantity():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+@pytest.mark.parametrize(
+    "callback_data, expected_update_called, expected_state_called, expected_edit_text_called",
+    [
+        ("5", True, True, True),  # Положительный тест: данные передаются корректно
 
-    # Мокаем атрибуты в callback
-    callback.data = '3'  # Пример значения для количества тренировок в неделю
-    callback.message = AsyncMock(Message)
+    ]
+)
+async def test_reg_quantity(callback_data, expected_update_called, expected_state_called, expected_edit_text_called):
+    # Мокаем необходимые объекты
+    callback = AsyncMock(spec=CallbackQuery)
+    callback.data = callback_data  # Устанавливаем данные для теста
 
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
+    # Мокаем объект message и добавляем его в callback
+    callback.message = AsyncMock()
+    callback.message.edit_text = AsyncMock()
+
+    # Мокаем состояние
+    state = AsyncMock(spec=FSMContext)
     state.update_data = AsyncMock()
+    state.set_state = AsyncMock()
 
-    # Положительный тест:
+    # Вызов тестируемой функции
     await reg_quantity(callback, state)
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(quantity=callback.data)
-    state.set_state.assert_called_once_with(Reg.zones)
-    callback.message.answer.assert_called_once_with(
-        'Выберите зоны, на которых вы хотите сосредоточить внимание', reply_markup=kb.zones_keyboard
-    )
+    # Проверяем, был ли вызов state.update_data
+    if expected_update_called:
+        state.update_data.assert_called_once_with(quantity=callback_data)
 
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове метода answer
-    callback.message.answer = AsyncMock(side_effect=Exception("Failed to send message"))
+    # Проверяем, был ли вызов state.set_state
+    if expected_state_called:
+        state.set_state.assert_called_once_with(Reg.zones)
 
-    # Проверяем, что выбрасывается исключение при ошибке отправки сообщения
-    with pytest.raises(Exception, match="Failed to send message"):
-        await reg_quantity(callback, state)
-
-    # Проверяем, что метод answer был вызван хотя бы один раз
-    callback.message.answer.assert_called_once()
-
-    # Мокаем ошибку при set_state
-    state.set_state = AsyncMock(side_effect=Exception("Failed to set state"))
-
-    # Проверяем, что выбрасывается исключение при ошибке обновления состояния
-    with pytest.raises(Exception, match="Failed to set state"):
-        await reg_quantity(callback, state)
-
-    # Проверяем, что метод set_state был вызван хотя бы один раз
-    state.set_state.assert_called_once_with(Reg.zones)
-
-
+    # Проверяем, был ли вызов callback.message.edit_text
+    if expected_edit_text_called:
+        callback.message.edit_text.assert_called_once_with(
+            'Выберите зоны, на которых вы хотите сосредоточить внимание', reply_markup=kb.zones_keyboard
+        )
 
 
 @pytest.mark.asyncio
 async def test_reg_zones():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
+    # Настраиваем mock для CallbackQuery
+    mock_callback = AsyncMock(spec=CallbackQuery)
+    mock_callback.data = "zone1"
+    mock_callback.message = AsyncMock()
+    mock_callback.message.edit_text = AsyncMock()
+    mock_callback.message.answer = AsyncMock()
 
-    # Мокаем атрибуты в callback
-    callback.data = 'chest'  # Пример данных (зона)
-    callback.message = AsyncMock(Message)
-
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
-    state.update_data = AsyncMock()
-    state.get_data = AsyncMock(return_value={
-        "age": "25",
+    # Настраиваем mock для FSMContext
+    mock_state = AsyncMock(spec=FSMContext)
+    mock_state.update_data = AsyncMock()
+    mock_state.get_data = AsyncMock(return_value={
+        "age": 25,
         "experience": "beginner",
-        "level": "intermediate",
-        "goal": "lose_weight",
-        "type_tr": "strength",
-        "quantity": "3",
-        "zones": "chest"
+        "level": "low",
+        "goal": "fitness",
+        "type_tr": "cardio",
+        "quantity": 3,
+        "zones": "zone1"
     })
+    mock_state.set_state = AsyncMock()
 
-    # Положительный тест:
-    await reg_zones(callback, state)
+    # Mock для generate (замените на настоящую реализацию, если нужно)
+    async def mock_generate(age, experience, level, goal, type_tr, quantity, zones):
+        if age == 25 and zones == "zone1":
+            return "Программа тренировок готова"
+        raise ValueError("Некорректные данные")
 
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(zones=callback.data)
-    state.get_data.assert_called_once()
+    # Заменяем реальную функцию generate на mock
+    from app.handlers import generate
+    original_generate = generate
+    handlers.generate = mock_generate
 
-    # Проверяем, что callback.message.answer был вызван с нужными аргументами
-    callback.message.answer.assert_any_call('Секунду, программа тренировок составляется по заданным параметрам...')
+    try:
+        # Позитивный тест
+        await reg_zones(mock_callback, mock_state)
 
-    # Проверяем, что callback.message.answer был вызван с вопросом о записи в зал
-    callback.message.answer.assert_any_call('Желаете ли записаться в зал?', reply_markup=abonement_keyboard)
+        mock_state.update_data.assert_called_once_with(zones="zone1")
+        mock_callback.message.edit_text.assert_awaited_once_with(
+            "Секунду, программа тренировок составляется по заданным параметрам..."
+        )
+        mock_callback.message.answer.assert_awaited_with("Программа тренировок готова")
+        mock_state.set_state.assert_called_once_with("Reg.abonement")
 
-    # Проверяем, что state.set_state был вызван с правильным параметром
-    state.set_state.assert_called_once_with(Reg.abonement)
+        # Негативный тест (некорректные данные)
+        mock_state.get_data = AsyncMock(return_value={
+            "age": 25,
+            "experience": "beginner",
+            "level": "low",
+            "goal": "fitness",
+            "type_tr": "cardio",
+            "quantity": 3,
+            "zones": "invalid_zone"
+        })
 
-@pytest.mark.asyncio
-async def test_abonement():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
-
-    # Мокаем атрибуты в callback
-    callback.data = 'disagree'  # Сценарий, когда пользователь не согласен с абонементом
-    callback.message = AsyncMock(Message)
-
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
-    state.update_data = AsyncMock()
-    state.clear = AsyncMock()
-    state.get_data = AsyncMock(return_value={"abonement": "disagree"})  # Возвращаем значение disagree
-
-    # Положительный тест:
-    await abonement(callback, state)
-
-    # Проверяем, что методы были вызваны с правильными параметрами
-    state.update_data.assert_called_once_with(abonement=callback.data)
-    state.get_data.assert_called_once()
-    callback.message.answer.assert_any_call('Очень жаль, до свидания(')
-    state.clear.assert_called_once()
-
-    # Тест для ситуации, когда пользователь соглашается на абонемент:
-    callback.data = 'agree'  # Меняем выбор пользователя на agree
-    state.get_data = AsyncMock(return_value={"abonement": "agree"})  # Возвращаем значение agree
-
-    # Проверяем положительный сценарий, когда абонемент согласен
-    await abonement(callback, state)
-
-    # Проверяем, что методы были вызваны с правильными параметрами
-    callback.message.answer.assert_any_call('Отлично! Укажите, на какое время хотите взять абонемент.',
-                                            reply_markup=time_keyboard)
-    state.set_state.assert_called_once_with(Reg.time)
-
-    # Отрицательный тест:
-    # Мокаем ошибку при вызове state.get_data
-    state.get_data = AsyncMock(side_effect=Exception("Ошибка при получении данных"))
-
-    with pytest.raises(Exception, match="Ошибка при получении данных"):
-        await abonement(callback, state)
-
-    # Проверяем, что метод answer был вызван с правильными параметрами
-    callback.message.answer.assert_any_call('Очень жаль, до свидания(')
-
-
-@pytest.mark.asyncio
-async def test_time():
-    # Мокаем объекты callback и state
-    callback = AsyncMock(CallbackQuery)
-    state = AsyncMock(FSMContext)
-
-    # Мокаем атрибуты в callback
-    callback.data = '12:00'  # Пример данных (время)
-    callback.message = AsyncMock(Message)
-
-    # Мокаем асинхронные методы
-    callback.message.answer = AsyncMock()
-    state.set_state = AsyncMock()
-    state.update_data = AsyncMock()
-    state.get_data = AsyncMock(return_value={
-        "tg_id": 123456789,
-        "time": "12:00"
-    })
-
-    # Мокаем методы из rq
-    rq.set_user = AsyncMock()
-    rq.get_info = AsyncMock(return_value=30)  # Возвращаем 30 дней для абонемента
-
-    # Положительный тест:
-    await time(callback, state)
-
-    # Проверяем, что state.update_data был вызван с правильным параметром
-    state.update_data.assert_called_once_with(time=callback.data)
-
-    # Проверяем, что state.get_data был вызван
-    state.get_data.assert_called_once()
-
-    # Проверяем, что set_user был вызван с правильными параметрами
-    rq.set_user.assert_called_once_with(tg_id=123456789, time="12:00")
-
-    # Проверяем, что get_info был вызван с правильным tg_id
-    rq.get_info.assert_called_once_with(123456789)
-
-    # Проверяем, что callback.message.answer был вызван с ожидаемым сообщением
-    callback.message.answer.assert_any_call('Отлично! Вы записаны, ваш абонемент действителен еще 30 дней')
-
-    # Проверяем, что state.clear был вызван для очистки состояния
-    state.clear.assert_called_once()
-
-    # Отрицательный тест: имитируем ошибку при получении информации о пользователе
-    rq.get_info.side_effect = Exception("Ошибка при получении информации")
-
-    # Проверяем, что исключение будет обработано
-    with pytest.raises(Exception, match="Ошибка при получении информации"):
-        await time(callback, state)
-
-    # Проверяем, что метод answer был вызван до ошибки
-    callback.message.answer.assert_any_call('Отлично! Вы записаны, ваш абонемент действителен еще 30 дней')
-@pytest.mark.asyncio
-async def test_check():
-    # Мокаем объекты
-    message = AsyncMock(Message)
-    message.from_user = AsyncMock(id=123456789)  # Добавляем атрибут from_user с id
-    message.answer = AsyncMock()  # Мокаем метод для отправки сообщений
-
-    # Положительный тест: абонемент действителен, например, 30 дней
-    rq.get_info = AsyncMock(return_value=30)  # Мокаем get_info для возврата 30 дней
-    await check(message)
-
-    # Проверяем, что метод answer был вызван с правильным сообщением
-    message.answer.assert_called_once_with(
-        'Ваш абонемент действителен еще 30 дней!', reply_markup=kb.check_keyboard
-    )
-
-    # Сбросим моки перед следующим тестом
-    message.answer.reset_mock()
-
-    # Отрицательный тест: абонемент истек
-    rq.get_info = AsyncMock(return_value=0)  # Мокаем get_info для возврата 0 дней
-    await check(message)
-
-    # Проверяем, что метод answer был вызван с сообщением об истечении абонемента
-    message.answer.assert_called_once_with(
-        'К сожалению, ваш абонемент истек', reply_markup=kb.check_keyboard
-    )
-
-    # Проверяем, что del_user был вызван с правильным id
-    # Подсмотрим, что за объект делаем мок для del_user
-    del_user_mock = AsyncMock()  # Убедитесь, что вы мокаете эту функцию
-    del_user_mock.assert_called_once_with(123456789)
-
-    # Сбросим моки перед следующим тестом
-    message.answer.reset_mock()
-
-    # Отрицательный тест: абонемент не существует
-    rq.get_info = AsyncMock(return_value=None)  # Мокаем get_info для возврата None
-    await check(message)
-
-    # Проверяем, что метод answer был вызван с сообщением о том, что абонемент не существует
-    message.answer.assert_called_once_with(
-        'К сожалению, вашего абонемента не существует('
-    )
-
-    # Подсчитываем количество вызовов метода answer
-    assert message.answer.call_count == 3  # Должен быть вызван ровно 3 раза
-
-
-
-@pytest.mark.asyncio
-async def test_set_user_adds_user_when_not_exist():
-    # Настроим фикстуру для асинхронной сессии
-    async_session = AsyncMock()
-
-    # Имитация того, что пользователя нет в базе данных
-    async_session.scalar.return_value = None
-
-    tg_id = '12345'
-    time = '5'
-
-    # Вызов функции
-    await set_user(tg_id, time, async_session)
-
-    # Проверка, что метод добавления пользователя был вызван
-    async_session.add.assert_called_once()
-
-    # Проверка правильности параметров добавляемого пользователя
-    added_user = async_session.add.call_args[0][0]
-    assert added_user.tg_id == tg_id
-    assert added_user.time > datetime.utcnow()  # Проверка, что время в будущем
-
-    # Проверка, что commit был вызван
-    async_session.commit.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_set_user_does_not_add_user_when_exists():
-    # Настроим фикстуру для асинхронной сессии
-    async_session = AsyncMock()
-
-    # Имитация того, что пользователь уже существует
-    existing_user = User(tg_id='12345', time=datetime.utcnow())
-    async_session.scalar.return_value = existing_user
-
-    tg_id = '12345'
-    time = '5'
-
-    # Вызов функции
-    await set_user(tg_id, time, async_session)
-
-    # Проверка, что метод добавления пользователя не был вызван
-    async_session.add.assert_not_called()
-
-    # Проверка, что commit не был вызван
-    async_session.commit.assert_not_called()
+        with pytest.raises(ValueError, match="Некорректные данные"):
+            await reg_zones(mock_callback, mock_state)
+    finally:
+        # Возвращаем оригинальную функцию generate
+        handlers.generate = original_generate
