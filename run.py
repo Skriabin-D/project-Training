@@ -1,7 +1,7 @@
 '''
 Файл для запуска бота.
 '''
-import logging #УДАЛИТЬ ПОТОМ
+import logging
 
 import asyncio
 from aiogram import Bot, Dispatcher
