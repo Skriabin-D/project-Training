@@ -1,6 +1,9 @@
+'''
+Файл, содержащий в себе запросы в базу данных: добавление, удаление пользователя и получение информации о нем.
+'''
 from app.database.models import async_session
 from app.database.models import User
-from sqlalchemy import select, delete
+from sqlalchemy import select
 from datetime import datetime, timedelta
 
 async def set_user(tg_id, time):
@@ -59,4 +62,3 @@ async def del_user(tg_id):
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
         await session.delete(user)
         await session.commit()
-    print(f'Пользователь {tg_id} удален')

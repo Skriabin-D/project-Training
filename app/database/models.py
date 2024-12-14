@@ -1,4 +1,7 @@
-from sqlalchemy import BigInteger, String, DateTime
+'''
+Файл, содержащий в себе таблицу в базе данных.
+'''
+from sqlalchemy import BigInteger, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 
@@ -15,18 +18,23 @@ class Base(AsyncAttrs, DeclarativeBase):
 class User(Base):
     '''
         Модель - таблица users в базе данных. Наследуется от базового класса
-
-        Атрибуты:
-            id (int): Уникальный идентификатор пользователя в базе данных. Является первичным ключом.
-            tg_id (int): Идентификатор пользователя в Telegram. Используется для поиска и идентификации пользователя.
-            time (datetime): Время, указывающее срок действия абонемента пользователя.
     '''
     __tablename__ = 'users'
-
+    '''
+    Название таблицы
+    '''
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    '''
+    ID пользователя в таблице
+    '''
     tg_id = mapped_column(BigInteger)
+    '''
+    Телеграмм id пользователя
+    '''
     time = mapped_column(DateTime)
-
+    '''
+    Время, в течение которого будет действителен абонемент
+    '''
 async def async_main():
     '''
     Асинхронная функция для создания всех таблиц в базе данных, используя SQLAlchemy.

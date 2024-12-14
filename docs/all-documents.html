@@ -28,7 +28,7 @@
       
       <div class="navlinks">
         <span class="navbar-brand">
-          requests/handlers/models/run/ai <a href="index.html">API Documentation</a>
+          run/requests/handlers/models/ai <a href="index.html">API Documentation</a>
         </span>
 
         <a href="moduleIndex.html">
@@ -100,22 +100,14 @@
       <h1>All Documents</h1>
 
        <ul>
-          <li id="handlers">
-            
-            <div class="fullName">handlers</div>
-            <div class="url">handlers.html</div>
-            <div class="type">Module</div>
-            <div class="kind">Module</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No module docstring; 0/1 variable, 12/12 functions, 1/1 class documented</span></div>
-          </li><li id="models">
+          <li id="models">
             
             <div class="fullName">models</div>
             <div class="url">models.html</div>
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No module docstring; 0/2 variable, 1/1 function, 2/2 classes documented</span></div>
+            <div class="summary">Файл, содержащий в себе таблицу в базе данных.</div>
           </li><li id="requests">
             
             <div class="fullName">requests</div>
@@ -123,7 +115,7 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No module docstring; 3/3 functions documented</span></div>
+            <div class="summary">Файл, содержащий в себе запросы в базу данных: добавление, удаление пользователя и получение информации о нем.</div>
           </li><li id="ai">
             
             <div class="fullName">ai</div>
@@ -131,7 +123,15 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No module docstring; 1/1 function documented</span></div>
+            <div class="summary">Файл, содержащий в себе запрос в нейросеть для составления программы тренировок.</div>
+          </li><li id="handlers">
+            
+            <div class="fullName">handlers</div>
+            <div class="url">handlers.html</div>
+            <div class="type">Module</div>
+            <div class="kind">Module</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Файл, содержащий в себе все обработчики событий, заданных пользователем.</div>
           </li><li id="run">
             
             <div class="fullName">run</div>
@@ -139,7 +139,111 @@
             <div class="type">Module</div>
             <div class="kind">Module</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No module docstring; 0/2 variable, 1/1 function documented</span></div>
+            <div class="summary">Файл для запуска бота.</div>
+          </li><li id="models.engine">
+            
+            <div class="fullName">models<wbr></wbr>.engine</div>
+            <div class="url">models.html#engine</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="undocumented">Undocumented</span></div>
+          </li><li id="models.async_session">
+            
+            <div class="fullName">models<wbr></wbr>.async<wbr></wbr>_session</div>
+            <div class="url">models.html#async_session</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary"><span class="undocumented">Undocumented</span></div>
+          </li><li id="models.Base">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>Base</div>
+            <div class="url">models.Base.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Базовый класс для всех моделей в базе данных.</div>
+          </li><li id="models.User">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User</div>
+            <div class="url">models.User.html</div>
+            <div class="type">Class</div>
+            <div class="kind">Class</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Модель - таблица users в базе данных. Наследуется от базового класса</div>
+          </li><li id="models.User.__tablename__">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.__tablename__</div>
+            <div class="url">models.User.html#__tablename__</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Название таблицы</div>
+          </li><li id="models.User.id">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.id</div>
+            <div class="url">models.User.html#id</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">ID пользователя в таблице</div>
+          </li><li id="models.User.tg_id">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.tg<wbr></wbr>_id</div>
+            <div class="url">models.User.html#tg_id</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Телеграмм id пользователя</div>
+          </li><li id="models.User.time">
+            
+            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.time</div>
+            <div class="url">models.User.html#time</div>
+            <div class="type">Attribute</div>
+            <div class="kind">Class Variable</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Время, в течение которого будет действителен абонемент</div>
+          </li><li id="models.async_main">
+            
+            <div class="fullName">models<wbr></wbr>.async<wbr></wbr>_main</div>
+            <div class="url">models.html#async_main</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Асинхронная функция для создания всех таблиц в базе данных, используя SQLAlchemy.</div>
+          </li><li id="requests.set_user">
+            
+            <div class="fullName">requests<wbr></wbr>.set<wbr></wbr>_user</div>
+            <div class="url">requests.html#set_user</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Асинхронная функция для добавления пользователя в базу данных</div>
+          </li><li id="requests.get_info">
+            
+            <div class="fullName">requests<wbr></wbr>.get<wbr></wbr>_info</div>
+            <div class="url">requests.html#get_info</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Асинхронная функция для получения оставшегося времени действия абонемента пользователя.</div>
+          </li><li id="requests.del_user">
+            
+            <div class="fullName">requests<wbr></wbr>.del<wbr></wbr>_user</div>
+            <div class="url">requests.html#del_user</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Асинхронная функция для удаления пользователя из базы данных по его tg_id.</div>
+          </li><li id="ai.generate">
+            
+            <div class="fullName">ai<wbr></wbr>.generate</div>
+            <div class="url">ai.html#generate</div>
+            <div class="type">Function</div>
+            <div class="kind">Function</div>
+            <div class="privacy">PUBLIC</div>
+            <div class="summary">Асинхронная функция для генерации программы тренировок с учетом заданных параметров при помощи нейросети Mistral AI.</div>
           </li><li id="handlers.router">
             
             <div class="fullName">handlers<wbr></wbr>.router</div>
@@ -163,7 +267,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Телеграмм id пользователя</div>
           </li><li id="handlers.Reg.age">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.age</div>
@@ -171,7 +275,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Возраст пользователя</div>
           </li><li id="handlers.Reg.experience">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.experience</div>
@@ -179,7 +283,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Опыт пользователя в зале</div>
           </li><li id="handlers.Reg.level">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.level</div>
@@ -187,7 +291,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Уровень  спортивной подготовки</div>
           </li><li id="handlers.Reg.goal">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.goal</div>
@@ -195,7 +299,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Цель, которую пользователь хочет достичь при помощи тренировок в зале</div>
           </li><li id="handlers.Reg.type_tr">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.type<wbr></wbr>_tr</div>
@@ -203,7 +307,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Наиболее подходящий тип тренировок для пользователя</div>
           </li><li id="handlers.Reg.quantity">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.quantity</div>
@@ -211,7 +315,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Желаемое количество тренировок в зале в неделю</div>
           </li><li id="handlers.Reg.zones">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.zones</div>
@@ -219,7 +323,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Зоны, на которые пользователь хочет сделать упор</div>
           </li><li id="handlers.Reg.abonement">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.abonement</div>
@@ -227,7 +331,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Согласен ли пользователь записаться</div>
           </li><li id="handlers.Reg.time">
             
             <div class="fullName">handlers<wbr></wbr>.<wbr></wbr>Reg<wbr></wbr>.time</div>
@@ -235,7 +339,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Class Variable</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Время, в течение которого будет действителен абонемент</div>
           </li><li id="handlers.start">
             
             <div class="fullName">handlers<wbr></wbr>.start</div>
@@ -332,110 +436,6 @@
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
             <div class="summary">Функция для проверки оставшегося времени действия абонемента пользователя.</div>
-          </li><li id="models.engine">
-            
-            <div class="fullName">models<wbr></wbr>.engine</div>
-            <div class="url">models.html#engine</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.async_session">
-            
-            <div class="fullName">models<wbr></wbr>.async<wbr></wbr>_session</div>
-            <div class="url">models.html#async_session</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.Base">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>Base</div>
-            <div class="url">models.Base.html</div>
-            <div class="type">Class</div>
-            <div class="kind">Class</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Базовый класс для всех моделей в базе данных.</div>
-          </li><li id="models.User">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User</div>
-            <div class="url">models.User.html</div>
-            <div class="type">Class</div>
-            <div class="kind">Class</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Модель - таблица users в базе данных. Наследуется от базового класса</div>
-          </li><li id="models.User.__tablename__">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.__tablename__</div>
-            <div class="url">models.User.html#__tablename__</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.User.id">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.id</div>
-            <div class="url">models.User.html#id</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.User.tg_id">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.tg<wbr></wbr>_id</div>
-            <div class="url">models.User.html#tg_id</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.User.time">
-            
-            <div class="fullName">models<wbr></wbr>.<wbr></wbr>User<wbr></wbr>.time</div>
-            <div class="url">models.User.html#time</div>
-            <div class="type">Attribute</div>
-            <div class="kind">Class Variable</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="models.async_main">
-            
-            <div class="fullName">models<wbr></wbr>.async<wbr></wbr>_main</div>
-            <div class="url">models.html#async_main</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Асинхронная функция для создания всех таблиц в базе данных, используя SQLAlchemy.</div>
-          </li><li id="requests.set_user">
-            
-            <div class="fullName">requests<wbr></wbr>.set<wbr></wbr>_user</div>
-            <div class="url">requests.html#set_user</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Асинхронная функция для добавления пользователя в базу данных</div>
-          </li><li id="requests.get_info">
-            
-            <div class="fullName">requests<wbr></wbr>.get<wbr></wbr>_info</div>
-            <div class="url">requests.html#get_info</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Асинхронная функция для получения оставшегося времени действия абонемента пользователя.</div>
-          </li><li id="requests.del_user">
-            
-            <div class="fullName">requests<wbr></wbr>.del<wbr></wbr>_user</div>
-            <div class="url">requests.html#del_user</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Асинхронная функция для удаления пользователя из базы данных по его tg_id.</div>
-          </li><li id="ai.generate">
-            
-            <div class="fullName">ai<wbr></wbr>.generate</div>
-            <div class="url">ai.html#generate</div>
-            <div class="type">Function</div>
-            <div class="kind">Function</div>
-            <div class="privacy">PUBLIC</div>
-            <div class="summary">Асинхронная функция для генерации программы тренировок с учетом заданных параметров при помощи нейросети Mistral AI.</div>
           </li><li id="run.bot">
             
             <div class="fullName">run<wbr></wbr>.bot</div>

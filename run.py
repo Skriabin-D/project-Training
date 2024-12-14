@@ -1,3 +1,6 @@
+'''
+Файл для запуска бота.
+'''
 import logging #УДАЛИТЬ ПОТОМ
 
 import asyncio

@@ -1,3 +1,6 @@
+'''
+Файл, содержащий в себе все обработчики событий, заданных пользователем.
+'''
 from aiogram import F, Router
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, CallbackQuery
@@ -15,30 +18,47 @@ router = Router()
 class Reg(StatesGroup):
     '''
     Класс состояний для регистрации пользователя в системе.
-
-    Атрибуты:
-        tg_id (State): Состояние для хранения идентификатора пользователя в Telegram.
-        age (State): Состояние для хранения возраста пользователя.
-        experience (State): Состояние для хранения опыта пользователя в тренировках.
-        level (State): Состояние для хранения уровня физической подготовки пользователя.
-        goal (State): Состояние для хранения цели тренировок пользователя.
-        type_tr (State): Состояние для хранения типа тренировок, которые предпочитает пользователь.
-        quantity (State): Состояние для хранения количества тренировок в неделю.
-        zones (State): Состояние для хранения зон тела, которые следует развивать.
-        abonement (State): Состояние для хранения информации о наличии абонемента.
-        time (State): Состояние для хранения времени действия абонемента пользователя.
     '''
     tg_id = State()
+    '''
+    Телеграмм id пользователя
+    '''
     age = State()
+    '''
+    Возраст пользователя
+    '''
     experience = State()
+    '''
+    Опыт пользователя в зале
+    '''
     level = State()
+    '''
+    Уровень  спортивной подготовки
+    '''
     goal = State()
+    '''
+    Цель, которую пользователь хочет достичь при помощи тренировок в зале
+    '''
     type_tr = State()
+    '''
+    Наиболее подходящий тип тренировок для пользователя
+    '''
     quantity = State()
+    '''
+    Желаемое количество тренировок в зале в неделю
+    '''
     zones = State()
+    '''
+    Зоны, на которые пользователь хочет сделать упор
+    '''
     abonement = State()
+    '''
+    Согласен ли пользователь записаться
+    '''
     time = State()
-
+    '''
+    Время, в течение которого будет действителен абонемент
+    '''
 @router.message(CommandStart())
 async def start(message: Message):
     """
@@ -52,7 +72,7 @@ async def start(message: Message):
            - Предлагает клавиатуру с кнопками для выбора дальнейших действий.
 
        Возвращаемое значение:
-           None
+           Coroutine
        """
     await message.answer(
         text='Здарова, давай начнем составлять программу тренировок. Жми кнопку /create, чтобы сделать это, либо, если у тебя уже есть абонемент, жми на эту кнопку',
@@ -74,7 +94,7 @@ async def register(message: Message, state: FSMContext):
             - Отправляет новое сообщение с запросом возраста и клавиатурой с возрастными опциями.
 
         Возвращает:
-            None
+            Coroutine
     '''
     await message.answer(
         'Хорошо, давай начнем!',
@@ -100,7 +120,7 @@ async def reg_age(callback: CallbackQuery, state: FSMContext):
             - Выводит клавиатуру с выбором опыта
 
         Возвращает:
-            None
+            Coroutine
     '''
     await state.update_data(age=callback.data)
     await state.set_state(Reg.experience)
@@ -121,7 +141,7 @@ async def reg_exp(callback: CallbackQuery, state: FSMContext):
             - Выводит клавиатуру с выбором уровня
 
         Возвращает:
-            None
+            Coroutine
     '''
     await state.update_data(experience=callback.data)
     await state.set_state(Reg.level)
@@ -142,7 +162,7 @@ async def reg_level(callback: CallbackQuery, state: FSMContext):
             - Выводит клавиатуру с выбором цели
 
         Возвращает:
-            None
+            Coroutine
     '''
     await state.update_data(level=callback.data)
     await state.set_state(Reg.goal)
@@ -163,7 +183,7 @@ async def reg_goal(callback: CallbackQuery, state: FSMContext):
             - Выводит клавиатуру с выбором типа тренировок
 
         Возвращает:
-            None
+            Coroutine
     '''
     await state.update_data(goal=callback.data)
     await state.set_state(Reg.type_tr)
@@ -184,7 +204,7 @@ async def reg_type(callback: CallbackQuery, state: FSMContext):
            - Выводит клавиатуру с выбором количества тренировок в неделю
 
        Возвращает:
-           None
+           Coroutine
     '''
     await state.update_data(type_tr=callback.data)
     await state.set_state(Reg.quantity)
@@ -205,7 +225,7 @@ async def reg_quantity(callback: CallbackQuery, state: FSMContext):
            - Выводит клавиатуру с выбором зон, на которых пользователь хочет сосредоточить внимание
 
         Возвращает:
-           None
+           Coroutine
     '''
     await state.update_data(quantity=callback.data)
     await state.set_state(Reg.zones)
@@ -229,7 +249,7 @@ async def reg_zones(callback: CallbackQuery, state: FSMContext):
           - Отправляет сообщение с предложением записаться в зал и клавиатуру с множественным выбором
 
       Возвращает:
-          None
+          Coroutine
     '''
     await state.update_data(zones=callback.data)
     data = await state.get_data()
@@ -275,7 +295,7 @@ async def abonement(callback: CallbackQuery, state: FSMContext):
             - В зависимости от действий пользователя обновляет сообщения и предлагает соответствующие варианты действий.
 
         Возвращает:
-            None
+            Coroutine
     '''
     await state.update_data(abonement=callback.data)
     data = await state.get_data()
@@ -333,7 +353,7 @@ async def time(callback: CallbackQuery, state: FSMContext):
         - Отправляет новое сообщение с побуждением к дополнительным действям и клавиатурой.
 
     Возвращает:
-        None
+        Coroutine
     '''
     await state.update_data(time=callback.data)
     data = await state.get_data()
@@ -366,7 +386,7 @@ async def check(message: Message, state: FSMContext):
         - Если абонемент истек или отсутствует, пользователю выводится клавиатура с выбором, записаться в зал или нет
 
     Возвращает:
-        None
+        Coroutine
     '''
     end_date = await rq.get_info(message.from_user.id)
     if end_date:
